@@ -1,6 +1,6 @@
 {
   "name": "pulse-tracker",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Pulse — desktop time-tracking widget. Periodic screen capture and recording, uploaded to the Isla Portal while clocked in.",
   "main": "main.js",
   "author": "Isla",
@@ -10,7 +10,7 @@
     "dev:renderer": "vite",
     "start": "npm run build:renderer && electron .",
     "dist": "npm run build:renderer && electron-builder",
-    "dist:win": "npm run build:renderer && electron-builder --win portable --publish never",
+    "dist:win": "npm run build:renderer && electron-builder --win --publish never",
     "dist:mac": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false npm run build:renderer && electron-builder --mac --publish never"
   },
   "dependencies": {
@@ -36,14 +36,27 @@
     "files": [
       "main.js",
       "preload.js",
-      "renderer/dist/**"
+      "renderer/dist/**",
+      "build/icon.png"
     ],
+    "icon": "build/icon.png",
     "win": {
-      "target": "portable",
-      "artifactName": "Pulse-win-x64.${ext}"
+      "target": "nsis",
+      "icon": "build/icon.png",
+      "artifactName": "Pulse-win-x64-setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Pulse",
+      "runAfterFinish": true
     },
     "linux": {
       "target": "AppImage",
+      "icon": "build/icon.png",
       "artifactName": "Pulse-linux-x64.${ext}"
     },
     "mac": {

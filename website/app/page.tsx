@@ -68,7 +68,7 @@ export default function Page() {
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-1">
               <a
-                href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64.exe"
+                href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64-setup.exe"
                 className="inline-flex h-12 items-center gap-2.5 rounded-full bg-ink px-6 font-semibold text-bg transition hover:bg-ink/85 active:scale-[0.98]"
               >
                 <i className="bx bxs-download text-lg" /> Download Now
@@ -202,7 +202,7 @@ export default function Page() {
           <div className="mt-4 grid items-center gap-8 lg:grid-cols-2">
             <div>
               <h2 className="display text-4xl sm:text-5xl">Meet your tracking future, starting now</h2>
-              <a href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64.exe" className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-lime px-7 py-4 font-semibold text-ink transition hover:bg-lime-deep">
+              <a href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64-setup.exe" className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-lime px-7 py-4 font-semibold text-ink transition hover:bg-lime-deep">
                 <i className="bx bxs-download text-xl" /> Try Pulse Now
               </a>
             </div>

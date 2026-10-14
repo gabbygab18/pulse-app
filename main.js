@@ -204,11 +204,15 @@ function createWindow() {
   win = new BrowserWindow({
     width: 320,
     height: 520,
+    minWidth: 280,
+    minHeight: 420,
+    maxWidth: 520,
     frame: false,
-    resizable: false,
+    resizable: true, // drag any edge to resize (Orbit-style)
     alwaysOnTop: true,
     skipTaskbar: true,
     transparent: true,
+    icon: path.join(__dirname, 'build', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -239,11 +243,9 @@ function updateTray() {
   ]));
 }
 
-// placeholder 16x16 tray icon (no asset file needed)
+// Pulse mark, 32px (inlined so no asset file needs packaging).
 function trayIcon() {
-  return nativeImage.createFromDataURL(
-    'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAMklEQVR42mNgGAWjYBSMglEwCkbBKBgFo2AUjIJRMApGwSgYBaNgFIyCUTAKRsEoAAB3QAABJzQd3QAAAABJRU5ErkJggg==',
-  );
+  return nativeImage.createFromDataURL('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAACXBIWXMAAAsTAAALEwEAmpwYAAAEgklEQVRYhc1XbVBUZRTeP9EP+7H33pn22g8tXVAW0AW0D9TRChDiY0tISDMEgklFjQyoQRyKFASXBVmUGPlSYxCB0LBCPidpBqFRB6206YflBx9q8bUsu+z2NOcFAUdgaQnGd+bMO+9573uf5znnvLvnSiRP4uC4Z504QcyUCuI1KS/2c4IIa4zO0js4QczgOJmjZWS5/GmOlx3hBNFsLegUZuJ4USuRKGymABfrZwH4UePFuglJSHnZ0VkHH7OsiXJunkMCJo6TOYwREMTMOQQfLlBBlj4WfkH283QPqtauQH7sRlw7thsPymJxvyQabVmhyI3ygt8rjv+BgHh1XP7FPksHXB2WoDFzBwy1B2GoS2XzYPV+6M/tw8CZOOhO70L/V++jOsEfLnaLLBPgxd7xKZjyYW83Z3RWJsLYqIHxghZDTUfYbGzQwFCTPEzi64+hO7UdfSfCcFMbDA+XJRZJTIuAq4MdOir2MbChH3NgaimAqfU4TBcL2NrYkI7B6i+gP/vpaBS6C97D75pAKG1fmDmB2rRwGGpTmGICNV8uwT9t5Ww2XcyH8YcsGGpSoK/ai4HyaPQXR6CnMAQPct9BVYzHzAio1jiz8BpqU2G8kA1TaxHMbeXA9e9gbiuDqaWQ+ake9OcSMFDxEfqLI0cJdGYHwnuFnfUE8qL9mTJSSEovnUhEVLAHLpemwXypGEPNeSMRSEbL4Qhs93FGc0rAGAFtADK2vGw9gavaUJZbyrGhQY24XZEI2RyE1csWM3AqRkO9GoPfJyEuKoztuS2dz2rg/pfB6MzagKZ4D+sJdBVFsOqm8PZ9mwSlwhbL7eUQ+Wegq9MMg58/gN7KeCgV8pG9eejK3YR7Rzei4/Bb+O2A1wwI5G+FrnQnBipjoK9KwCrHBZBx87DaaSEM55OZcvLTvpv9c2xv1dL5LPxd2YG4m6HC9SRP6wlcSXubVTUjUbEHrZlh2OG/Ej9pI6H/Jh76M58wv640Cs3JAdjm5YCmRB/cywlCR9YG3FH7ojFmnfUEciJfRU/RVna3dSXboDu9EwNlH7LrRjOtyd9/Mpw993feu8O51wbgrsYft9LegDrY1XoCPi/Z469jm9FdGILe46HoOxnOyFBUaKY1+ano6DkCp9C3Z76J24d88EeyJzyVi2f2Q3Q21pPllNR1529hYHTNaKY1+Wmfio6Ut2eocFvtiz9T1qPsg8mv4LQJOMkX4kaqigGQQgJ7aLQmP6mmiqewk3ICv7J3HZYtWjBzApwgwl1pixsH/VhhkcqHRut2As5QsYK7lerNwk7grzlN/T/wCAEpL/Zaelgpfx6Vu9fiTrrfmKl9mWIGnLIeN/e741TkixaVk0kFsceqhsTLxRaaTSvZ9fr1c3f88tnrqN+zBoeCXOC53HIfMGFDwlHfPs2D/5dJBZl6XFMqc2SN4twRMPG8qBglwEjwonYOCWRKHh8KG44Xa2c/9GKNRCJ5agICNBQ29NEwS+kwjSifDFwyOuijgfp2qtTpdMyTquXFPvYOQaZ+LOdPyvgXO7SzpIGrNwYAAAAASUVORK5CYII=');
 }
 
 // ---------------------------------------------------------------------------

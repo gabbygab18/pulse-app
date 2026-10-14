@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 
 // Served from GitHub Releases (built + published by CI on each version tag).
 const REL = 'https://github.com/gabbygab18/pulse-app/releases/latest/download';
-const WIN_ZIP = `${REL}/Pulse-win-x64.exe`;
+const WIN_ZIP = `${REL}/Pulse-win-x64-setup.exe`;
 const MAC_DMG = `${REL}/Pulse-mac.dmg`;
 // CI publishes Pulse-mac.dmg to the Release, so the macOS download is live.
 const MAC_READY = true;
