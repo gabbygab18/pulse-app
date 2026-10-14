@@ -209,7 +209,7 @@ async function pollStatus() {
 
 function startStatusSync() {
   pollStatus(); // immediate
-  if (!statusTimer) statusTimer = setInterval(pollStatus, 20_000);
+  if (!statusTimer) statusTimer = setInterval(pollStatus, 8_000);
 }
 function stopStatusSync() {
   if (statusTimer) clearInterval(statusTimer);
@@ -395,6 +395,7 @@ const showWindow = () => {
   win.setAlwaysOnTop(true);
   win.moveTop();
   win.focus();
+  pollStatus(); // refresh clock state the moment the widget is opened
 };
 
 if (!app.requestSingleInstanceLock()) app.exit(0);
