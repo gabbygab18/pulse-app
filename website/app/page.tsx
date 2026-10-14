@@ -1,5 +1,5 @@
 import { LiveAvatar } from '@/components/LiveAvatar';
-import { DownloadButtons, DownloadInline } from '@/components/Download';
+import { DownloadButtons, DownloadInline, PrimaryDownload } from '@/components/Download';
 import { Shots } from '@/components/Shots';
 
 function SectionLabel({ n, label, dark = false }: { n: string; label: string; dark?: boolean }) {
@@ -67,12 +67,7 @@ export default function Page() {
               are backed by proof, not guesswork. Light, always-on-top, and out of your way.
             </p>
             <div className="flex flex-wrap items-center gap-4 pt-1">
-              <a
-                href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64-setup.exe"
-                className="inline-flex h-12 items-center gap-2.5 rounded-full bg-ink px-6 font-semibold text-bg transition hover:bg-ink/85 active:scale-[0.98]"
-              >
-                <i className="bx bxs-download text-lg" /> Download Now
-              </a>
+              <PrimaryDownload />
               <a
                 href="#install"
                 className="inline-flex h-12 items-center gap-2.5 rounded-full border border-ink/15 bg-card px-6 font-semibold text-ink shadow-sm transition hover:bg-bg active:scale-[0.98]"
@@ -202,9 +197,7 @@ export default function Page() {
           <div className="mt-4 grid items-center gap-8 lg:grid-cols-2">
             <div>
               <h2 className="display text-4xl sm:text-5xl">Meet your tracking future, starting now</h2>
-              <a href="https://github.com/gabbygab18/pulse-app/releases/latest/download/Pulse-win-x64-setup.exe" className="mt-8 inline-flex items-center gap-2.5 rounded-full bg-lime px-7 py-4 font-semibold text-ink transition hover:bg-lime-deep">
-                <i className="bx bxs-download text-xl" /> Try Pulse Now
-              </a>
+              <PrimaryDownload className="mt-8" />
             </div>
             <div className="flex justify-center lg:justify-end">
               <div className="float rotate-6 rounded-[22px] card-gradient p-3">
