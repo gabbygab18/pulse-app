@@ -263,7 +263,7 @@ export default function Page() {
             Disclosed, transparent tracking. A red indicator shows the whole time capture is active.
           </p>
           <div className="mt-8 flex justify-center">
-            <DownloadButtons center />
+            <DownloadButtons center onDark />
           </div>
         </div>
       </section>
