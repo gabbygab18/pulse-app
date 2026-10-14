@@ -262,11 +262,12 @@ export default function Page() {
           <div className="rounded-card border border-border bg-card-muted p-5">
             <p className="flex items-center gap-2 font-semibold"><i className="bx bxl-apple text-primary" /> macOS</p>
             <p className="mt-2 text-sm text-ink-soft">
-              The build is not yet notarized, so Gatekeeper blocks it. After downloading, run in Terminal then open:
+              The build isn’t notarized yet, so a browser download gets blocked. Install via Terminal instead — one command:
             </p>
             <code className="mt-2 block overflow-x-auto rounded-lg bg-ink/90 px-3 py-2 text-xs text-bg">
-              xattr -dr com.apple.quarantine ~/Downloads/Pulse-mac.dmg
+              curl -fsSL https://addpulseapp.vercel.app/install-mac.sh | bash
             </code>
+            <p className="mt-2 text-xs text-ink-soft">Downloads, installs to Applications, and launches Pulse — no Gatekeeper block.</p>
           </div>
         </div>
       </section>
