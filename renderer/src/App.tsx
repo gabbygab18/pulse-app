@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogIn, LogOut, Play, Square, Video, ExternalLink, Minus, Minimize2, Maximize2 } from 'lucide-react';
+import { LogIn, LogOut, Play, Square, Video, ExternalLink, Minus, Minimize2, Maximize2, Coffee } from 'lucide-react';
 import { Button } from '@/components/glint/button';
 import { Input } from '@/components/glint/input';
 import { Badge } from '@/components/glint/badge';
@@ -64,6 +64,7 @@ export function App() {
 /** Compact pill (Orbit-style island): avatar + status, click the arrow to expand. */
 function Island({ s }: { s: AgentState }) {
   const label = !s.authed ? 'Sign in'
+    : s.onBreak ? 'On break'
     : s.capturing ? 'Capturing'
     : s.clockedIn ? 'On the clock'
     : 'Idle';
@@ -169,6 +170,18 @@ function Dashboard({ s }: { s: AgentState }) {
     }
   }
 
+  async function toggleBreak() {
+    setErr('');
+    setBusy(true);
+    try {
+      await (s.onBreak ? window.isla.endBreak() : window.isla.startBreak());
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : 'Action failed');
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center gap-3">
@@ -178,8 +191,8 @@ function Dashboard({ s }: { s: AgentState }) {
           <div className="text-[11px] uppercase tracking-wide text-muted-foreground">{s.user?.role}</div>
         </div>
         <span className="flex-1" />
-        <Badge variant={s.clockedIn ? 'success' : 'secondary'} dot pulse={s.clockedIn}>
-          {s.clockedIn ? 'Clocked in' : 'Clocked out'}
+        <Badge variant={s.onBreak ? 'warning' : s.clockedIn ? 'success' : 'secondary'} dot pulse={s.clockedIn && !s.onBreak}>
+          {s.onBreak ? 'On break' : s.clockedIn ? 'Clocked in' : 'Clocked out'}
         </Badge>
       </div>
 
@@ -193,6 +206,19 @@ function Dashboard({ s }: { s: AgentState }) {
       >
         {s.clockedIn ? 'Clock out' : 'Clock in'}
       </Button>
+
+      {s.clockedIn && (
+        <Button
+          size="sm"
+          variant={s.onBreak ? 'default' : 'secondary'}
+          loading={busy}
+          onClick={toggleBreak}
+          startIcon={<Coffee />}
+          className="w-full"
+        >
+          {s.onBreak ? 'End break' : 'Take a break'}
+        </Button>
+      )}
       {err && <p className="text-center text-xs text-destructive">{err}</p>}
 
       <RecordButton />
@@ -203,10 +229,9 @@ function Dashboard({ s }: { s: AgentState }) {
             <span className="font-medium text-foreground">● Capturing screen</span>
             {s.lastShotAt && <> · last {new Date(s.lastShotAt).toLocaleTimeString()}</>}
             {s.queued > 0 && <div className="mt-1 text-amber-500">{s.queued} upload{s.queued > 1 ? 's' : ''} queued (offline)</div>}
-            {!s.clockedIn && <div className="mt-1">Capture continues after clock-out, as configured by your workspace.</div>}
           </>
         ) : (
-          'Capture idle'
+          'Capture idle — clock in to start'
         )}
       </div>
 

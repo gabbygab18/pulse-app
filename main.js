@@ -18,9 +18,8 @@ const DEFAULTS = {
   token: null,
   user: null,
   captureIntervalMs: 10 * 60 * 1000, // ~10 min between screenshots (Hubstaff-style)
-  // Requirement: capture starts at clock-in and is NOT stopped by clock-out.
-  // ponytail: single global flag; make it per-user policy only if the business needs it.
-  keepCapturingAfterClockOut: true,
+  // Capture runs only while clocked in — it stops on clock-out.
+  keepCapturingAfterClockOut: false,
   retryMs: 30 * 1000, // how often to retry a failed/offline upload
   mode: 'panel', // last display mode: 'panel' | 'island'
 };
@@ -41,7 +40,7 @@ const SIZES = { panel: { width: 320, height: 520 }, island: { width: 248, height
 
 let config = DEFAULTS;
 let mode = 'panel'; // 'panel' (full) | 'island' (compact pill)
-let state = { clockedIn: false, capturing: false, sessionId: null, lastShotAt: null, queued: 0 };
+let state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, lastShotAt: null, queued: 0 };
 let captureTimer = null;
 let drainTimer = null;
 let statusTimer = null;
@@ -189,10 +188,11 @@ function reconcileShift(shift) {
   const running = !!shift;
   if (running) {
     state.sessionId = shift.id;
+    state.onBreak = !!shift.break_started_at;
     if (!state.clockedIn) { state.clockedIn = true; startCapture(); }
   } else if (state.clockedIn) {
     state.clockedIn = false;
-    // Requirement: capture does NOT stop on clock-out.
+    state.onBreak = false;
     if (!config.keepCapturingAfterClockOut) stopCapture();
   }
   pushState();
@@ -228,8 +228,22 @@ async function clockIn() {
 async function clockOut() {
   await api('/clock-out', { method: 'POST' });
   state.clockedIn = false;
-  // Requirement: capture must NOT stop on clock-out.
-  if (!config.keepCapturingAfterClockOut) stopCapture();
+  state.onBreak = false;
+  if (!config.keepCapturingAfterClockOut) stopCapture(); // capture stops on clock-out
+  pushState();
+  updateTray();
+}
+
+async function startBreak() {
+  const res = await api('/break/start', { method: 'POST' });
+  state.onBreak = !!res.shift?.break_started_at;
+  pushState();
+  updateTray();
+}
+
+async function endBreak() {
+  const res = await api('/break/end', { method: 'POST' });
+  state.onBreak = !!res.shift?.break_started_at;
   pushState();
   updateTray();
 }
@@ -320,7 +334,7 @@ ipcMain.handle('login', async (_e, { email, password }) => {
 ipcMain.handle('logout', async () => {
   stopStatusSync();
   stopCapture();
-  state = { clockedIn: false, capturing: false, sessionId: null, lastShotAt: null, queued: countQueued() };
+  state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, lastShotAt: null, queued: countQueued() };
   config.token = null; config.user = null;
   saveConfig(config);
   pushState();
@@ -329,6 +343,8 @@ ipcMain.handle('logout', async () => {
 
 ipcMain.handle('clock-in', () => clockIn());
 ipcMain.handle('clock-out', () => clockOut());
+ipcMain.handle('break-start', () => startBreak());
+ipcMain.handle('break-end', () => endBreak());
 ipcMain.handle('open-portal', () => shell.openExternal(config.apiUrl));
 
 ipcMain.handle('set-mode', (_e, m) => {

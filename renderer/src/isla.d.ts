@@ -1,6 +1,7 @@
 export interface AgentState {
   authed: boolean;
   clockedIn: boolean;
+  onBreak: boolean;
   capturing: boolean;
   sessionId: number | null;
   lastShotAt: string | null;
@@ -20,6 +21,8 @@ declare global {
       logout(): Promise<void>;
       clockIn(): Promise<void>;
       clockOut(): Promise<void>;
+      startBreak(): Promise<void>;
+      endBreak(): Promise<void>;
       openPortal(): Promise<void>;
       setMode(mode: 'panel' | 'island'): Promise<'panel' | 'island'>;
       getScreenSource(): Promise<string | null>;
