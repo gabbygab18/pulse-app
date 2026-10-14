@@ -1,4 +1,5 @@
 import { Logo } from '@/components/Logo';
+import { LiveAvatar } from '@/components/LiveAvatar';
 import { DownloadButtons, DownloadInline } from '@/components/Download';
 import { Shots } from '@/components/Shots';
 
@@ -105,6 +106,8 @@ export default function Page() {
                 </text>
               </svg>
             </div>
+            {/* live, moving procedural avatar (avatar-app engine) */}
+            <LiveAvatar name="Nacho" size={132} className="pointer-events-none absolute -bottom-12 left-1/2 z-10 -translate-x-1/2" />
           </div>
         </div>
 
