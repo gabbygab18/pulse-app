@@ -44,6 +44,7 @@ let mode = 'panel'; // 'panel' (full) | 'island' (compact pill)
 let state = { clockedIn: false, capturing: false, sessionId: null, lastShotAt: null, queued: 0 };
 let captureTimer = null;
 let drainTimer = null;
+let statusTimer = null;
 let win = null;
 let tray = null;
 
@@ -179,6 +180,42 @@ function stopCapture() {
 // ---------------------------------------------------------------------------
 // Clock in / out
 // ---------------------------------------------------------------------------
+// ---------------------------------------------------------------------------
+// Two-way clock sync: the portal's Shift is the source of truth. The widget
+// polls it so a clock-in/out done on the web portal is reflected here (and the
+// widget's own clock-in writes the same Shift, so the portal sees it too).
+// ---------------------------------------------------------------------------
+function reconcileShift(shift) {
+  const running = !!shift;
+  if (running) {
+    state.sessionId = shift.id;
+    if (!state.clockedIn) { state.clockedIn = true; startCapture(); }
+  } else if (state.clockedIn) {
+    state.clockedIn = false;
+    // Requirement: capture does NOT stop on clock-out.
+    if (!config.keepCapturingAfterClockOut) stopCapture();
+  }
+  pushState();
+  updateTray();
+}
+
+async function pollStatus() {
+  if (!config.token) return;
+  try {
+    const res = await api('/status');
+    reconcileShift(res.shift);
+  } catch { /* offline / transient — try again next tick */ }
+}
+
+function startStatusSync() {
+  pollStatus(); // immediate
+  if (!statusTimer) statusTimer = setInterval(pollStatus, 20_000);
+}
+function stopStatusSync() {
+  if (statusTimer) clearInterval(statusTimer);
+  statusTimer = null;
+}
+
 async function clockIn() {
   const res = await api('/clock-in', { method: 'POST' });
   state.clockedIn = true;
@@ -271,11 +308,7 @@ ipcMain.handle('login', async (_e, { email, password }) => {
   config.token = res.token;
   config.user = res.user;
   saveConfig(config);
-  // Reflect any shift already running on the portal.
-  try {
-    const st = await api('/status');
-    if (st.shift) { state.clockedIn = true; state.sessionId = st.shift.id; startCapture(); }
-  } catch { /* ignore */ }
+  startStatusSync(); // reflect any running shift + keep in sync
   drainQueue();
   pushState();
   updateTray();
@@ -283,6 +316,7 @@ ipcMain.handle('login', async (_e, { email, password }) => {
 });
 
 ipcMain.handle('logout', async () => {
+  stopStatusSync();
   stopCapture();
   state = { clockedIn: false, capturing: false, sessionId: null, lastShotAt: null, queued: countQueued() };
   config.token = null; config.user = null;
@@ -362,6 +396,9 @@ app.whenReady().then(() => {
   // Retry drainer — clears the backlog once the network/portal is reachable.
   drainTimer = setInterval(() => drainQueue(), config.retryMs);
   drainQueue();
+
+  // Already signed in? Sync clock state with the portal right away.
+  if (config.token) startStatusSync();
 });
 
 app.on('window-all-closed', () => { /* stay alive in tray */ });
