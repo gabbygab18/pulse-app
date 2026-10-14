@@ -105,7 +105,8 @@ async function drainQueue() {
       const buf = fs.readFileSync(binPath);
       const fd = new FormData();
       for (const [k, v] of Object.entries(job.meta)) if (v != null) fd.append(k, String(v));
-      const mime = job.filename.endsWith('.webm') ? 'video/webm' : 'image/png';
+      const mime = job.filename.endsWith('.webm') ? 'video/webm'
+        : job.filename.endsWith('.jpg') ? 'image/jpeg' : 'image/png';
       fd.append('file', new Blob([buf], { type: mime }), job.filename);
 
       try {
@@ -139,8 +140,9 @@ async function captureAndQueue() {
     });
     if (!sources.length) return;
 
-    const png = sources[0].thumbnail.toPNG();
-    enqueue(png, `screen-${Date.now()}.png`, {
+    // JPEG keeps the upload small; the portal re-encodes it to a compact WebP.
+    const jpg = sources[0].thumbnail.toJPEG(55);
+    enqueue(jpg, `screen-${Date.now()}.jpg`, {
       type: 'screenshot',
       taken_at: new Date().toISOString(),
       ...(state.sessionId ? { time_session_id: state.sessionId } : {}),
