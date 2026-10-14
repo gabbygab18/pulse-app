@@ -1,0 +1,17 @@
+# deps
+node_modules/
+**/node_modules/
+
+# build output / artifacts (never commit — rebuilt by CI, released to GitHub Releases)
+dist/
+release/
+renderer/dist/
+website/.next/
+website/out/
+website/public/downloads/
+
+# logs / os
+*.log
+shots-run.log
+.DS_Store
+Thumbs.db

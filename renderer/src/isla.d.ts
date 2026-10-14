@@ -1,0 +1,27 @@
+export interface AgentState {
+  authed: boolean;
+  clockedIn: boolean;
+  capturing: boolean;
+  sessionId: number | null;
+  lastShotAt: string | null;
+  queued: number;
+  apiUrl: string;
+  user: { id: number; name: string; email: string; role: string } | null;
+}
+
+declare global {
+  interface Window {
+    isla: {
+      getState(): Promise<AgentState>;
+      onState(cb: (s: AgentState) => void): void;
+      setApiUrl(url: string): Promise<string>;
+      login(creds: { email: string; password: string }): Promise<AgentState['user']>;
+      logout(): Promise<void>;
+      clockIn(): Promise<void>;
+      clockOut(): Promise<void>;
+      openPortal(): Promise<void>;
+      getScreenSource(): Promise<string | null>;
+      uploadRecording(buf: ArrayBuffer): Promise<void>;
+    };
+  }
+}

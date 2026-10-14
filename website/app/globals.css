@@ -1,0 +1,88 @@
+@import "tailwindcss";
+
+/* Carty-inspired: cream base, heavy black display type, lime accent,
+   rounded black feature/CTA sections. */
+:root {
+  --bg: #f2f2ef;
+  --ink: #0b0b0b;
+  --ink-soft: #6c6c6c;
+  --card: #ffffff;
+  --card-muted: #ebebe8;
+  --dark: #0c0c0c;
+  --dark-soft: #161616;
+  --on-dark: #f4f4f2;
+  --on-dark-soft: #9a9a98;
+  --lime: #d6fb3f;
+  --lime-deep: #c2ef1f;
+  --border: rgba(0, 0, 0, 0.09);
+  --border-dark: rgba(255, 255, 255, 0.1);
+  --radius: 28px;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-card: var(--card);
+  --color-card-muted: var(--card-muted);
+  --color-dark: var(--dark);
+  --color-dark-soft: var(--dark-soft);
+  --color-on-dark: var(--on-dark);
+  --color-on-dark-soft: var(--on-dark-soft);
+  --color-lime: var(--lime);
+  --color-lime-deep: var(--lime-deep);
+  --color-border: var(--border);
+  --radius-card: var(--radius);
+  --font-sans: var(--font-poppins), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-display: var(--font-satoshi), var(--font-poppins), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+  }
+  ::selection { background: var(--lime); color: var(--ink); }
+}
+
+/* Heavy, tight display headings in Satoshi — the Carty signature. */
+.display {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 0.98;
+}
+.index-num { font-family: var(--font-display); }
+
+/* The oversized faded section index (01, 02 …). */
+.index-num {
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1;
+  color: color-mix(in srgb, var(--ink) 7%, transparent);
+}
+.index-num.on-dark { color: color-mix(in srgb, var(--on-dark) 9%, transparent); }
+
+/* Rotating circular badge. */
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow 14s linear infinite; }
+
+/* Partner-grid marquee-free static tiles get a soft hover. */
+.tile { transition: background-color .2s, transform .2s; }
+.tile:hover { background: var(--card); transform: translateY(-2px); }
+
+/* Colorful hero card gradient, à la Carty's cards. */
+.card-gradient {
+  background:
+    radial-gradient(120% 120% at 0% 0%, #67e8c3 0%, transparent 45%),
+    radial-gradient(120% 120% at 100% 0%, #ff8a5b 0%, transparent 45%),
+    radial-gradient(130% 130% at 70% 100%, #c86bff 0%, transparent 50%),
+    linear-gradient(135deg, #ff5bb0, #ffb037);
+}
+
+@keyframes float { 0%,100% { transform: translateY(0) } 50% { transform: translateY(-12px) } }
+.float { animation: float 6s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { .float, .spin-slow { animation: none } }
