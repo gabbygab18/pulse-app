@@ -6,8 +6,8 @@ import { useEffect, useState } from 'react';
 const REL = 'https://github.com/gabbygab18/pulse-app/releases/latest/download';
 const WIN_ZIP = `${REL}/Pulse-win-x64.exe`;
 const MAC_DMG = `${REL}/Pulse-mac.dmg`;
-// Flip to true once the .dmg (from the macOS CI build) is in public/downloads.
-const MAC_READY = false;
+// CI publishes Pulse-mac.dmg to the Release, so the macOS download is live.
+const MAC_READY = true;
 
 export function DownloadButtons({ center = false }: { center?: boolean }) {
   const [os, setOs] = useState<'win' | 'mac' | 'other'>('other');
