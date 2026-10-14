@@ -8,6 +8,10 @@ on:
     tags: ['v*']
   workflow_dispatch:
 
+# Needed so the release step can upload assets with the default GITHUB_TOKEN.
+permissions:
+  contents: write
+
 jobs:
   build:
     strategy:
