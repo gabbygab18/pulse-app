@@ -248,14 +248,16 @@ function createWindow() {
   win = new BrowserWindow({
     width: SIZES[mode].width,
     height: SIZES[mode].height,
-    minWidth: 240,
-    minHeight: 60,
-    maxWidth: 520,
     frame: false,
-    resizable: true, // drag any edge to resize (Orbit-style)
+    // Resizable transparent windows on Windows draw a non-client frame
+    // (the dark rectangle). Keep it off for clean edges, like Orbit; the
+    // panel/island toggle handles sizing instead.
+    resizable: false,
     alwaysOnTop: true,
     skipTaskbar: true,
     transparent: true,
+    backgroundColor: '#00000000', // fully transparent — no painted rectangle
+    hasShadow: false,
     icon: path.join(__dirname, 'build', 'icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -334,8 +336,9 @@ ipcMain.handle('set-mode', (_e, m) => {
   config.mode = mode;
   saveConfig(config);
   if (win && !win.isDestroyed()) {
+    win.setResizable(true);
     win.setSize(SIZES[mode].width, SIZES[mode].height, true);
-    win.setResizable(mode === 'panel');
+    win.setResizable(false);
   }
   pushState();
   return mode;
