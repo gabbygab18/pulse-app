@@ -15,11 +15,16 @@ export function LiveAvatar({
   name = 'Nacho',
   anim,
   size = 120,
+  color,
+  shadow = true,
   className,
 }: {
   name?: string;
   anim?: string;
   size?: number;
+  /** Override the avatar's body color (e.g. to match the brand). */
+  color?: string;
+  shadow?: boolean;
   className?: string;
 }) {
   const avatar: Avatar = useMemo(() => CAST.find((a) => a.name === name) ?? CAST[0], [name]);
@@ -34,10 +39,10 @@ export function LiveAvatar({
       <AvatarSvg
         avatar={avatar}
         face={frame.face}
-        color={frame.color}
+        color={color ?? frame.color}
         blink={frame.blink}
         float={frame.float}
-        className="h-full w-full drop-shadow-xl"
+        className={`h-full w-full ${shadow ? 'drop-shadow-xl' : ''}`}
       />
     </span>
   );

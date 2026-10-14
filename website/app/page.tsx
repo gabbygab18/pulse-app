@@ -1,4 +1,3 @@
-import { Logo } from '@/components/Logo';
 import { LiveAvatar } from '@/components/LiveAvatar';
 import { DownloadButtons, DownloadInline } from '@/components/Download';
 import { Shots } from '@/components/Shots';
@@ -35,7 +34,9 @@ export default function Page() {
       {/* NAV */}
       <header className="mx-auto flex max-w-6xl items-center justify-between px-6 py-6">
         <div className="flex items-center gap-2.5">
-          <Logo size={32} />
+          <span className="flex size-9 items-center justify-center rounded-xl bg-ink">
+            <LiveAvatar name="Ember" color="#f4a564" size={24} shadow={false} />
+          </span>
           <span className="text-lg font-bold tracking-tight">Pulse</span>
         </div>
         <nav className="hidden items-center gap-8 text-sm font-medium text-ink-soft md:flex">
@@ -274,7 +275,10 @@ export default function Page() {
       {/* FOOTER */}
       <footer className="mx-auto max-w-6xl px-6 pb-10">
         <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 text-sm text-ink-soft sm:flex-row">
-          <div className="flex items-center gap-2"><Logo size={24} /><span className="font-semibold text-ink">Pulse</span></div>
+          <div className="flex items-center gap-2">
+            <span className="flex size-7 items-center justify-center rounded-lg bg-ink"><LiveAvatar name="Ember" color="#f4a564" size={18} shadow={false} /></span>
+            <span className="font-semibold text-ink">Pulse</span>
+          </div>
           <div className="flex items-center gap-6">
             <a href="#features" className="hover:text-ink">Features</a>
             <a href="#install" className="hover:text-ink">Install</a>
