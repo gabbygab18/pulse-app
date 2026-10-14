@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: "Satoshi";
+  src: url("./fonts/Satoshi-Variable.woff2") format("woff2");
+  font-weight: 300 900;
+  font-display: swap;
+}
+@font-face { font-family: "Poppins"; src: url("./fonts/poppins-400-normal.woff2") format("woff2"); font-weight: 400; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("./fonts/poppins-500-normal.woff2") format("woff2"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("./fonts/poppins-600-normal.woff2") format("woff2"); font-weight: 600; font-display: swap; }
+@font-face { font-family: "Poppins"; src: url("./fonts/poppins-700-normal.woff2") format("woff2"); font-weight: 700; font-display: swap; }
+
+:root {
+  --font-poppins: "Poppins";
+  --font-satoshi: "Satoshi";
+}
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* shadcn token names, so Glint UI components drop in unchanged. */
@@ -84,6 +100,9 @@
   #root {
     background: transparent;
     color: var(--foreground);
+  }
+  body {
+    font-family: var(--font-sans);
   }
   .dark {
     color-scheme: dark;

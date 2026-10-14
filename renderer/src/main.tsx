@@ -1,5 +1,6 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
+import 'boxicons/css/boxicons.min.css';
 import './globals.css';
 import { App } from './App';
 

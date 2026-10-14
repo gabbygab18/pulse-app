@@ -8,6 +8,8 @@ export interface AgentState {
   queued: number;
   apiUrl: string;
   mode: 'panel' | 'island';
+  startedAt: string | null;
+  breakStartedAt: string | null;
   user: { id: number; name: string; email: string; role: string } | null;
 }
 

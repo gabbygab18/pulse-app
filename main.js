@@ -40,7 +40,7 @@ const SIZES = { panel: { width: 320, height: 520 }, island: { width: 248, height
 
 let config = DEFAULTS;
 let mode = 'panel'; // 'panel' (full) | 'island' (compact pill)
-let state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, lastShotAt: null, queued: 0 };
+let state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastShotAt: null, queued: 0 };
 let captureTimer = null;
 let drainTimer = null;
 let statusTimer = null;
@@ -188,11 +188,15 @@ function reconcileShift(shift) {
   const running = !!shift;
   if (running) {
     state.sessionId = shift.id;
+    state.startedAt = shift.started_at ?? state.startedAt;
+    state.breakStartedAt = shift.break_started_at ?? null;
     state.onBreak = !!shift.break_started_at;
     if (!state.clockedIn) { state.clockedIn = true; startCapture(); }
   } else if (state.clockedIn) {
     state.clockedIn = false;
     state.onBreak = false;
+    state.startedAt = null;
+    state.breakStartedAt = null;
     if (!config.keepCapturingAfterClockOut) stopCapture();
   }
   pushState();
@@ -220,6 +224,9 @@ async function clockIn() {
   const res = await api('/clock-in', { method: 'POST' });
   state.clockedIn = true;
   state.sessionId = res.shift?.id ?? null;
+  state.startedAt = res.shift?.started_at ?? new Date().toISOString();
+  state.breakStartedAt = null;
+  state.onBreak = false;
   startCapture(); // capture begins at clock-in
   pushState();
   updateTray();
@@ -229,6 +236,8 @@ async function clockOut() {
   await api('/clock-out', { method: 'POST' });
   state.clockedIn = false;
   state.onBreak = false;
+  state.startedAt = null;
+  state.breakStartedAt = null;
   if (!config.keepCapturingAfterClockOut) stopCapture(); // capture stops on clock-out
   pushState();
   updateTray();
@@ -236,14 +245,16 @@ async function clockOut() {
 
 async function startBreak() {
   const res = await api('/break/start', { method: 'POST' });
-  state.onBreak = !!res.shift?.break_started_at;
+  state.breakStartedAt = res.shift?.break_started_at ?? new Date().toISOString();
+  state.onBreak = !!state.breakStartedAt;
   pushState();
   updateTray();
 }
 
 async function endBreak() {
   const res = await api('/break/end', { method: 'POST' });
-  state.onBreak = !!res.shift?.break_started_at;
+  state.breakStartedAt = res.shift?.break_started_at ?? null;
+  state.onBreak = !!state.breakStartedAt;
   pushState();
   updateTray();
 }
@@ -334,7 +345,7 @@ ipcMain.handle('login', async (_e, { email, password }) => {
 ipcMain.handle('logout', async () => {
   stopStatusSync();
   stopCapture();
-  state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, lastShotAt: null, queued: countQueued() };
+  state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastShotAt: null, queued: countQueued() };
   config.token = null; config.user = null;
   saveConfig(config);
   pushState();

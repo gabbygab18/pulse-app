@@ -1,6 +1,6 @@
 {
   "name": "pulse-tracker",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Pulse — desktop time-tracking widget. Periodic screen capture and recording, uploaded to the Isla Portal while clocked in.",
   "main": "main.js",
   "author": "Isla",
@@ -14,6 +14,7 @@
     "dist:mac": "cross-env CSC_IDENTITY_AUTO_DISCOVERY=false npm run build:renderer && electron-builder --mac --publish never"
   },
   "dependencies": {
+    "boxicons": "^2.1.4",
     "clsx": "^2.1.1",
     "lucide-react": "^0.456.0",
     "motion": "^11.15.0",

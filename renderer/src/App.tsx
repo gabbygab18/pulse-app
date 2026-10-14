@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogIn, LogOut, Play, Square, Video, ExternalLink, Minus, Minimize2, Maximize2, Coffee } from 'lucide-react';
 import { Button } from '@/components/glint/button';
 import { Input } from '@/components/glint/input';
 import { Badge } from '@/components/glint/badge';
@@ -12,6 +11,31 @@ import type { AgentState } from './isla';
 const CAST = defaultProject().avatars;
 const drag = { WebkitAppRegion: 'drag' } as React.CSSProperties;
 const noDrag = { WebkitAppRegion: 'no-drag' } as React.CSSProperties;
+
+/** Filled Boxicon. */
+const Bx = ({ n, className = '' }: { n: string; className?: string }) => <i className={`bx ${n} ${className}`} />;
+
+/** Re-renders every second while `active`, for live timers. */
+function useNow(active: boolean) {
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    if (!active) return undefined;
+    const t = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(t);
+  }, [active]);
+  return now;
+}
+
+function fmtDur(ms: number) {
+  const s = Math.max(0, Math.floor(ms / 1000));
+  const h = Math.floor(s / 3600);
+  const m = Math.floor((s % 3600) / 60);
+  const sec = s % 60;
+  return h > 0
+    ? `${h}h ${String(m).padStart(2, '0')}m ${String(sec).padStart(2, '0')}s`
+    : `${m}m ${String(sec).padStart(2, '0')}s`;
+}
+const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 /** Deterministic avatar per person, so each staff member keeps the same face. */
 function castFor(seed: string) {
@@ -47,10 +71,10 @@ export function App() {
         <span className="text-sm font-semibold">Pulse</span>
         <span className="flex-1" />
         <button style={noDrag} onClick={() => window.isla.setMode('island')} className="rounded-md p-1 text-muted-foreground hover:bg-muted" aria-label="Collapse to pill">
-          <Minimize2 className="size-4" />
+          <Bx n="bx-collapse-alt" className="text-base" />
         </button>
         <button style={noDrag} onClick={() => window.close()} className="rounded-md p-1 text-muted-foreground hover:bg-muted" aria-label="Hide">
-          <Minus className="size-4" />
+          <Bx n="bx-minus" className="text-base" />
         </button>
       </header>
 
@@ -63,12 +87,16 @@ export function App() {
 
 /** Compact pill (Orbit-style island): avatar + status, click the arrow to expand. */
 function Island({ s }: { s: AgentState }) {
+  const now = useNow(s.clockedIn);
   const label = !s.authed ? 'Sign in'
     : s.onBreak ? 'On break'
     : s.capturing ? 'Capturing'
     : s.clockedIn ? 'On the clock'
     : 'Idle';
-  const sub = s.capturing && s.queued > 0 ? `${s.queued} queued` : (s.authed ? (s.user?.name ?? '') : 'Pulse');
+  const sub = s.onBreak && s.breakStartedAt ? `Break ${fmtDur(now - Date.parse(s.breakStartedAt))}`
+    : s.clockedIn && s.startedAt ? fmtDur(now - Date.parse(s.startedAt))
+    : s.queued > 0 ? `${s.queued} queued`
+    : (s.authed ? (s.user?.name ?? '') : 'Pulse');
 
   return (
     <div className="flex h-screen items-center justify-center p-1">
@@ -84,7 +112,7 @@ function Island({ s }: { s: AgentState }) {
           <div className="truncate text-[11px] text-muted-foreground">{sub}</div>
         </div>
         <button style={noDrag} onClick={() => window.isla.setMode('panel')} className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-foreground hover:bg-muted/70" aria-label="Expand">
-          <Maximize2 className="size-3.5" />
+          <Bx n="bx-expand-alt" className="text-sm" />
         </button>
       </div>
     </div>
@@ -146,7 +174,7 @@ function Login({ s }: { s: AgentState }) {
         onChange={(e) => setPassword(e.target.value)}
         error={err || undefined}
       />
-      <Button type="submit" size="sm" loading={busy} startIcon={<LogIn />} className="w-full">
+      <Button type="submit" size="sm" loading={busy} startIcon={<Bx n="bxs-log-in-circle" className="text-base" />} className="w-full">
         Sign in
       </Button>
     </form>
@@ -157,6 +185,7 @@ function Dashboard({ s }: { s: AgentState }) {
   const [err, setErr] = useState('');
   const [busy, setBusy] = useState(false);
   const name = s.user?.name || s.user?.email || '';
+  const now = useNow(s.clockedIn);
 
   async function toggleClock() {
     setErr('');
@@ -196,12 +225,27 @@ function Dashboard({ s }: { s: AgentState }) {
         </Badge>
       </div>
 
+      {s.clockedIn && s.startedAt && (
+        <div className="rounded-lg border border-border bg-background/50 px-3 py-3 text-center">
+          <div className="flex items-center justify-center gap-1.5 text-xl font-bold [font-variant-numeric:tabular-nums]">
+            <Bx n="bxs-time-five" className="text-lg text-muted-foreground" />
+            {fmtDur(now - Date.parse(s.startedAt))}
+          </div>
+          <div className="mt-1 text-[11px] text-muted-foreground">Clocked in at {fmtTime(s.startedAt)}</div>
+          {s.onBreak && s.breakStartedAt && (
+            <div className="mt-1.5 flex items-center justify-center gap-1 text-xs font-semibold text-amber-500">
+              <Bx n="bxs-coffee" /> On break · {fmtDur(now - Date.parse(s.breakStartedAt))}
+            </div>
+          )}
+        </div>
+      )}
+
       <Button
         size="sm"
         variant={s.clockedIn ? 'destructive' : 'default'}
         loading={busy}
         onClick={toggleClock}
-        startIcon={s.clockedIn ? <Square /> : <Play />}
+        startIcon={<Bx n={s.clockedIn ? "bxs-log-out-circle" : "bxs-log-in-circle"} className="text-base" />}
         className="w-full"
       >
         {s.clockedIn ? 'Clock out' : 'Clock in'}
@@ -213,7 +257,7 @@ function Dashboard({ s }: { s: AgentState }) {
           variant={s.onBreak ? 'default' : 'secondary'}
           loading={busy}
           onClick={toggleBreak}
-          startIcon={<Coffee />}
+          startIcon={<Bx n="bxs-coffee" className="text-base" />}
           className="w-full"
         >
           {s.onBreak ? 'End break' : 'Take a break'}
@@ -236,10 +280,10 @@ function Dashboard({ s }: { s: AgentState }) {
       </div>
 
       <div className="flex items-center justify-between">
-        <Button size="sm" variant="link" onClick={() => window.isla.openPortal()} startIcon={<ExternalLink />}>
+        <Button size="sm" variant="link" onClick={() => window.isla.openPortal()} startIcon={<Bx n="bx-link-external" className="text-base" />}>
           Open Portal
         </Button>
-        <Button size="sm" variant="ghost" onClick={() => window.isla.logout()} startIcon={<LogOut />}>
+        <Button size="sm" variant="ghost" onClick={() => window.isla.logout()} startIcon={<Bx n="bxs-exit" className="text-base" />}>
           Sign out
         </Button>
       </div>
@@ -312,7 +356,7 @@ function RecordButton() {
         variant={rec ? 'destructive' : 'outline'}
         loading={busy}
         onClick={() => (rec ? stop() : start())}
-        startIcon={<Video />}
+        startIcon={<Bx n="bxs-video" className="text-base" />}
         className="w-full"
       >
         {rec ? 'Stop recording' : 'Start recording'}
