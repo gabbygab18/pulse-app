@@ -306,7 +306,26 @@ ipcMain.handle('get-screen-source', async () => {
 // ---------------------------------------------------------------------------
 // Lifecycle
 // ---------------------------------------------------------------------------
-const showWindow = () => { if (win && !win.isDestroyed()) { win.show(); win.focus(); } };
+// Bring the widget back reliably: recreate if gone, restore if minimized, and
+// re-center if it ended up off-screen (otherwise show() is a silent no-op when
+// Electron still thinks the off-screen window is "visible").
+function isOnScreen(bounds) {
+  return screen.getAllDisplays().some((d) => {
+    const w = d.workArea;
+    return bounds.x < w.x + w.width && bounds.x + bounds.width > w.x
+        && bounds.y < w.y + w.height && bounds.y + bounds.height > w.y;
+  });
+}
+
+const showWindow = () => {
+  if (!win || win.isDestroyed()) { createWindow(); return; }
+  if (win.isMinimized()) win.restore();
+  if (!isOnScreen(win.getBounds())) win.center();
+  win.show();
+  win.setAlwaysOnTop(true);
+  win.moveTop();
+  win.focus();
+};
 
 if (!app.requestSingleInstanceLock()) app.exit(0);
 app.on('second-instance', showWindow);
