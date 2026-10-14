@@ -1,24 +1,24 @@
 {
-  "name": "isla-tracker-website",
+  "name": "pulse-website",
   "version": "1.0.0",
   "private": true,
-  "description": "Download and install site for the Isla Tracker desktop app.",
+  "description": "Download and install site for the Pulse desktop app.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
   "dependencies": {
-    "next": "15.1.6",
+    "next": "^16.4.0",
     "react": "19.0.0",
     "react-dom": "19.0.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.0",
-    "tailwindcss": "^4.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "tailwindcss": "^4.0.0",
     "typescript": "^5"
   }
 }
