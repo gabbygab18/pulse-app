@@ -40,14 +40,10 @@
       "target": "dmg",
       "artifactName": "Pulse-mac.${ext}",
       "category": "public.app-category.productivity",
-      "hardenedRuntime": true,
-      "gatekeeperAssess": false,
-      "entitlements": "build/entitlements.mac.plist",
-      "entitlementsInherit": "build/entitlements.mac.plist",
+      "identity": null,
       "extendInfo": {
         "NSScreenCaptureUsageDescription": "Pulse captures your screen periodically while you are clocked in, so your work hours can be verified in the Isla Portal."
       }
-    },
-    "afterSign": "build/notarize.js"
+    }
   }
 }
