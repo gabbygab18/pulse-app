@@ -40,7 +40,7 @@ const SIZES = { panel: { width: 320, height: 520 }, island: { width: 248, height
 
 let config = DEFAULTS;
 let mode = 'panel'; // 'panel' (full) | 'island' (compact pill)
-let state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastShotAt: null, queued: 0 };
+let state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastClockOut: null, lastShotAt: null, queued: 0 };
 let captureTimer = null;
 let drainTimer = null;
 let statusTimer = null;
@@ -193,6 +193,9 @@ function reconcileShift(shift) {
     state.onBreak = !!shift.break_started_at;
     if (!state.clockedIn) { state.clockedIn = true; startCapture(); }
   } else if (state.clockedIn) {
+    // Clock-out happened elsewhere (e.g. the web portal) — /status has no shift
+    // details, so record the time now without a worked total.
+    state.lastClockOut = { at: new Date().toISOString(), worked: null };
     state.clockedIn = false;
     state.onBreak = false;
     state.startedAt = null;
@@ -227,13 +230,15 @@ async function clockIn() {
   state.startedAt = res.shift?.started_at ?? new Date().toISOString();
   state.breakStartedAt = null;
   state.onBreak = false;
+  state.lastClockOut = null;
   startCapture(); // capture begins at clock-in
   pushState();
   updateTray();
 }
 
 async function clockOut() {
-  await api('/clock-out', { method: 'POST' });
+  const res = await api('/clock-out', { method: 'POST' });
+  state.lastClockOut = { at: res.shift?.ended_at ?? new Date().toISOString(), worked: res.shift?.worked_minutes ?? null };
   state.clockedIn = false;
   state.onBreak = false;
   state.startedAt = null;
@@ -345,7 +350,7 @@ ipcMain.handle('login', async (_e, { email, password }) => {
 ipcMain.handle('logout', async () => {
   stopStatusSync();
   stopCapture();
-  state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastShotAt: null, queued: countQueued() };
+  state = { clockedIn: false, onBreak: false, capturing: false, sessionId: null, startedAt: null, breakStartedAt: null, lastClockOut: null, lastShotAt: null, queued: countQueued() };
   config.token = null; config.user = null;
   saveConfig(config);
   pushState();

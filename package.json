@@ -1,6 +1,6 @@
 {
   "name": "pulse-tracker",
-  "version": "1.0.9",
+  "version": "1.0.10",
   "description": "Pulse — desktop time-tracking widget. Periodic screen capture and recording, uploaded to the Isla Portal while clocked in.",
   "main": "main.js",
   "author": "Isla",

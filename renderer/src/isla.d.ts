@@ -10,6 +10,7 @@ export interface AgentState {
   mode: 'panel' | 'island';
   startedAt: string | null;
   breakStartedAt: string | null;
+  lastClockOut: { at: string; worked: number | null } | null;
   user: { id: number; name: string; email: string; role: string } | null;
 }
 

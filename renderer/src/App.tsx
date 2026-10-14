@@ -36,6 +36,7 @@ function fmtDur(ms: number) {
     : `${m}m ${String(sec).padStart(2, '0')}s`;
 }
 const fmtTime = (iso: string) => new Date(iso).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+const hhmm = (m: number) => `${Math.floor(m / 60)}h ${String(m % 60).padStart(2, '0')}m`;
 
 /** Deterministic avatar per person, so each staff member keeps the same face. */
 function castFor(seed: string) {
@@ -237,6 +238,14 @@ function Dashboard({ s }: { s: AgentState }) {
               <Bx n="bxs-coffee" /> On break · {fmtDur(now - Date.parse(s.breakStartedAt))}
             </div>
           )}
+        </div>
+      )}
+
+      {!s.clockedIn && s.lastClockOut && (
+        <div className="flex items-center justify-center gap-1.5 rounded-lg border border-border bg-background/50 px-3 py-2 text-xs text-muted-foreground">
+          <Bx n="bxs-log-out-circle" className="text-sm" />
+          Clocked out at {fmtTime(s.lastClockOut.at)}
+          {s.lastClockOut.worked != null && <> · worked {hhmm(s.lastClockOut.worked)}</>}
         </div>
       )}
 
