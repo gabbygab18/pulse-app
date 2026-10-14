@@ -22,6 +22,7 @@ const DEFAULTS = {
   // ponytail: single global flag; make it per-user policy only if the business needs it.
   keepCapturingAfterClockOut: true,
   retryMs: 30 * 1000, // how often to retry a failed/offline upload
+  mode: 'panel', // last display mode: 'panel' | 'island'
 };
 
 function loadConfig() {
@@ -35,7 +36,11 @@ function saveConfig(cfg) {
   fs.writeFileSync(CONFIG_PATH(), JSON.stringify(cfg, null, 2));
 }
 
+// Window sizes for the two display modes.
+const SIZES = { panel: { width: 320, height: 520 }, island: { width: 248, height: 68 } };
+
 let config = DEFAULTS;
+let mode = 'panel'; // 'panel' (full) | 'island' (compact pill)
 let state = { clockedIn: false, capturing: false, sessionId: null, lastShotAt: null, queued: 0 };
 let captureTimer = null;
 let drainTimer = null;
@@ -196,7 +201,7 @@ async function clockOut() {
 // Windows / tray
 // ---------------------------------------------------------------------------
 function currentState() {
-  return { ...state, user: config.user, authed: !!config.token, apiUrl: config.apiUrl };
+  return { ...state, mode, user: config.user, authed: !!config.token, apiUrl: config.apiUrl };
 }
 function pushState() {
   if (win && !win.isDestroyed()) win.webContents.send('state', currentState());
@@ -204,10 +209,10 @@ function pushState() {
 
 function createWindow() {
   win = new BrowserWindow({
-    width: 320,
-    height: 520,
-    minWidth: 280,
-    minHeight: 420,
+    width: SIZES[mode].width,
+    height: SIZES[mode].height,
+    minWidth: 240,
+    minHeight: 60,
     maxWidth: 520,
     frame: false,
     resizable: true, // drag any edge to resize (Orbit-style)
@@ -290,6 +295,18 @@ ipcMain.handle('clock-in', () => clockIn());
 ipcMain.handle('clock-out', () => clockOut());
 ipcMain.handle('open-portal', () => shell.openExternal(config.apiUrl));
 
+ipcMain.handle('set-mode', (_e, m) => {
+  mode = m === 'island' ? 'island' : 'panel';
+  config.mode = mode;
+  saveConfig(config);
+  if (win && !win.isDestroyed()) {
+    win.setSize(SIZES[mode].width, SIZES[mode].height, true);
+    win.setResizable(mode === 'panel');
+  }
+  pushState();
+  return mode;
+});
+
 ipcMain.handle('upload-recording', (_e, arrayBuffer) => {
   enqueue(Buffer.from(arrayBuffer), `rec-${Date.now()}.webm`, {
     type: 'recording',
@@ -332,6 +349,7 @@ app.on('second-instance', showWindow);
 
 app.whenReady().then(() => {
   config = loadConfig();
+  mode = config.mode === 'island' ? 'island' : 'panel';
   state.queued = countQueued();
   createWindow();
   tray = new Tray(trayIcon());

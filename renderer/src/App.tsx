@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { LogIn, LogOut, Play, Square, Video, ExternalLink, Minus } from 'lucide-react';
+import { LogIn, LogOut, Play, Square, Video, ExternalLink, Minus, Minimize2, Maximize2 } from 'lucide-react';
 import { Button } from '@/components/glint/button';
 import { Input } from '@/components/glint/input';
 import { Badge } from '@/components/glint/badge';
@@ -38,12 +38,17 @@ export function App() {
     window.isla.onState(setS);
   }, []);
 
+  if (s && s.mode === 'island') return <Island s={s} />;
+
   return (
     <div className="flex h-screen flex-col overflow-hidden rounded-2xl border border-border bg-card text-card-foreground">
       <header style={drag} className="flex items-center gap-2 border-b border-border bg-background/60 px-3 py-2">
         <CaptureDot capturing={!!s?.capturing} clockedIn={!!s?.clockedIn} />
         <span className="text-sm font-semibold">Pulse</span>
         <span className="flex-1" />
+        <button style={noDrag} onClick={() => window.isla.setMode('island')} className="rounded-md p-1 text-muted-foreground hover:bg-muted" aria-label="Collapse to pill">
+          <Minimize2 className="size-4" />
+        </button>
         <button style={noDrag} onClick={() => window.close()} className="rounded-md p-1 text-muted-foreground hover:bg-muted" aria-label="Hide">
           <Minus className="size-4" />
         </button>
@@ -52,6 +57,35 @@ export function App() {
       <main style={noDrag} className="flex flex-1 flex-col gap-4 overflow-auto p-4">
         {!s ? null : s.authed ? <Dashboard s={s} /> : <Login s={s} />}
       </main>
+    </div>
+  );
+}
+
+/** Compact pill (Orbit-style island): avatar + status, click the arrow to expand. */
+function Island({ s }: { s: AgentState }) {
+  const label = !s.authed ? 'Sign in'
+    : s.capturing ? 'Capturing'
+    : s.clockedIn ? 'On the clock'
+    : 'Idle';
+  const sub = s.capturing && s.queued > 0 ? `${s.queued} queued` : (s.authed ? (s.user?.name ?? '') : 'Pulse');
+
+  return (
+    <div className="flex h-screen items-center justify-center p-1">
+      <div style={drag} className="flex w-full items-center gap-2.5 rounded-full border border-border bg-card/95 px-2.5 py-1.5 shadow-xl backdrop-blur">
+        {s.authed
+          ? <LiveAvatar seed={s.user?.email || 'pulse'} size={34} />
+          : <span className="flex size-[34px] items-center justify-center rounded-full bg-ink/10"><CaptureDot capturing={false} clockedIn={false} /></span>}
+        <div className="min-w-0 flex-1 leading-tight">
+          <div className="flex items-center gap-1.5">
+            <CaptureDot capturing={!!s.capturing} clockedIn={!!s.clockedIn} />
+            <span className="truncate text-[13px] font-semibold">{label}</span>
+          </div>
+          <div className="truncate text-[11px] text-muted-foreground">{sub}</div>
+        </div>
+        <button style={noDrag} onClick={() => window.isla.setMode('panel')} className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-foreground hover:bg-muted/70" aria-label="Expand">
+          <Maximize2 className="size-3.5" />
+        </button>
+      </div>
     </div>
   );
 }

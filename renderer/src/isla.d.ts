@@ -6,6 +6,7 @@ export interface AgentState {
   lastShotAt: string | null;
   queued: number;
   apiUrl: string;
+  mode: 'panel' | 'island';
   user: { id: number; name: string; email: string; role: string } | null;
 }
 
@@ -20,6 +21,7 @@ declare global {
       clockIn(): Promise<void>;
       clockOut(): Promise<void>;
       openPortal(): Promise<void>;
+      setMode(mode: 'panel' | 'island'): Promise<'panel' | 'island'>;
       getScreenSource(): Promise<string | null>;
       uploadRecording(buf: ArrayBuffer): Promise<void>;
     };

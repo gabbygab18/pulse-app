@@ -11,6 +11,7 @@ contextBridge.exposeInMainWorld('isla', {
   clockIn: () => ipcRenderer.invoke('clock-in'),
   clockOut: () => ipcRenderer.invoke('clock-out'),
   openPortal: () => ipcRenderer.invoke('open-portal'),
+  setMode: (mode) => ipcRenderer.invoke('set-mode', mode),
   // recording
   getScreenSource: () => ipcRenderer.invoke('get-screen-source'),
   uploadRecording: (buf) => ipcRenderer.invoke('upload-recording', buf),
