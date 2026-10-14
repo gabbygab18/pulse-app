@@ -19,10 +19,26 @@ const poppins = Poppins({
   display: 'swap',
 });
 
+const DESC =
+  'Pulse is the desktop time-tracking widget for modern teams. Clock in, and your screen is captured periodically and synced to your workspace.';
+
 export const metadata: Metadata = {
-  title: 'Pulse — Download',
-  description:
-    'Pulse is the desktop time-tracking widget for modern teams. Clock in, and your screen is captured periodically and synced to your workspace.',
+  metadataBase: new URL('https://addpulseapp.vercel.app'),
+  title: 'Pulse — Time tracking with proof',
+  description: DESC,
+  alternates: { canonical: '/' },
+  openGraph: {
+    title: 'Pulse — Time tracking with proof',
+    description: DESC,
+    url: '/',
+    siteName: 'Pulse',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Pulse — Time tracking with proof',
+    description: DESC,
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
