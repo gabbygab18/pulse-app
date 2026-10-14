@@ -77,12 +77,13 @@
   * {
     border-color: var(--border);
   }
-  html {
-    background: var(--background);
+  /* The Electron window is transparent — only the card/pill paints, so the
+     page itself must stay transparent (no dark box behind the rounded shape). */
+  html,
+  body,
+  #root {
+    background: transparent;
     color: var(--foreground);
-  }
-  body {
-    background: var(--background);
   }
   .dark {
     color-scheme: dark;

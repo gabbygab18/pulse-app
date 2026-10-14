@@ -71,7 +71,7 @@ function Island({ s }: { s: AgentState }) {
 
   return (
     <div className="flex h-screen items-center justify-center p-1">
-      <div style={drag} className="flex w-full items-center gap-2.5 rounded-full border border-border bg-card/95 px-2.5 py-1.5 shadow-xl backdrop-blur">
+      <div style={drag} className="flex w-full items-center gap-2.5 rounded-full border border-white/10 bg-[#141926] px-2.5 py-1.5 shadow-2xl shadow-black/40">
         {s.authed
           ? <LiveAvatar seed={s.user?.email || 'pulse'} size={34} />
           : <span className="flex size-[34px] items-center justify-center rounded-full bg-ink/10"><CaptureDot capturing={false} clockedIn={false} /></span>}
